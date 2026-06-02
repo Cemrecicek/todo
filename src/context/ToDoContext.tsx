@@ -29,14 +29,14 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     loadTasks();
   }, []);
 
-  const loadTasks = async () => {
+  const loadTasks = () => {
     const storedTasks = storage.getString("tasks");
 
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
     }
   };
-  const saveTasks = async (newTasks: Task[]) => {
+  const saveTasks = (newTasks: Task[]) => {
     storage.set("tasks", JSON.stringify(newTasks));
   };
 
