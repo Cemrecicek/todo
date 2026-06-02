@@ -1,173 +1,105 @@
+import { Box } from "@/components/ui/box";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
+import { Input, InputField } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
 import { useState } from "react";
-import {
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-} from "react-native";
-
-type Task = {
-  text: string;
-  checked: boolean;
-};
+import { useTodo } from "../context/ToDoContext";
 
 export default function HomeScreen() {
   const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const addTask = () => {
+  const { tasks, addTask, deleteTask, toggleTask } = useTodo();
+
+  const handleAddTask = () => {
     if (task.trim() === "") {
       return;
     }
 
-    setTasks([...tasks, { text: task, checked: false }]);
+    addTask(task);
     setTask("");
-  };
-  const deleteTask = (index: number) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
-  };
-
-  const toggleTask = (index: number) => {
-    const newTasks = [...tasks];
-
-    newTasks[index].checked = !newTasks[index].checked;
-
-    setTasks(newTasks);
   };
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/todo.png")}
-          style={{ width: 50, height: 50 }}
-        />
-        <Text style={styles.headerTitle}>To Do List</Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Görev ekleyin"
-          value={task}
-          onChangeText={setTask}
-        />
+    <Box className="flex-1 bg-sky-100 px-5">
+      <Box className=" px-5 pt-10 pb-5">
+        <Box className="mb-6 flex-row items-center gap-3">
+          <Text className="text-3xl">📝</Text>
+          <Box>
+            <Heading
+              size="3xl"
+              style={{ fontFamily: "PatrickHand_400Regular" }}
+            >
+              To Do List
+            </Heading>
+          </Box>
+        </Box>
+      </Box>
 
-        <Pressable style={styles.addbtn} onPress={addTask}>
-          <Text style={styles.buttonText}>Ekle</Text>
-        </Pressable>
-      </View>
+      <Box className="flex-row items-center gap-3  pt-5">
+        <Input
+          variant="rounded"
+          className="flex-1 border border-white/80 bg-white/70"
+        >
+          <InputField
+            placeholder="Görev ekle..."
+            onSubmitEditing={handleAddTask}
+            value={task}
+            onChangeText={setTask}
+            blurOnSubmit={false}
+          />
+        </Input>
 
-      <View style={styles.taskList}>
+        <Button
+          onPress={handleAddTask}
+          size="md"
+          className="rounded-full border-white/80 bg-white/70 px-5"
+        >
+          <ButtonText>Ekle</ButtonText>
+        </Button>
+      </Box>
+
+      <Box className="mt-6">
+        {tasks.length === 0 && (
+          <Text className="mt-10 text-center text-gray-400">
+            Henüz görev eklenmedi
+          </Text>
+        )}
         {tasks.map((item, index) => (
-          <View key={index} style={styles.taskRow}>
+          <Box
+            key={index}
+            className="mb-3 flex-row items-center justify-between rounded-xl border border-white/80 bg-white/70 p-4"
+          >
             <Pressable
-              key={index}
-              style={styles.check}
+              className="flex-1 flex-row items-center"
               onPress={() => toggleTask(index)}
             >
-              <Text style={styles.checkbox}>{item.checked ? "☑️" : "⬜"}</Text>
-              <Text style={[item.checked && styles.checkedTaskItem]}>
+              <Text className="mr-3 text-xxl text-green-600 ">
+                {item.checked ? "✓" : "⬜"}
+              </Text>
+
+              <Text
+                className={
+                  item.checked
+                    ? "flex-1 text-gray-400 line-through"
+                    : "flex-1 text-gray-800"
+                }
+              >
                 {item.text}
               </Text>
             </Pressable>
-            <Pressable
-              style={styles.deletebtn}
+
+            <Button
+              size="xs"
+              className="bg-red-500/80"
               onPress={() => deleteTask(index)}
             >
-              <Text style={styles.buttonText}>sil</Text>
-            </Pressable>
-          </View>
+              <ButtonText className="text-white">X</ButtonText>
+            </Button>
+          </Box>
         ))}
-      </View>
-    </View>
+      </Box>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
-
-  headerSubtitle: {
-    fontSize: 16,
-    color: "#666",
-  },
-
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  input: {
-    flex: 1,
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginRight: 10,
-  },
-  check: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  checkbox: {
-    fontSize: 20,
-    marginRight: 10,
-  },
-
-  addbtn: {
-    height: 50,
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 20,
-    justifyContent: "center",
-    borderRadius: 10,
-  },
-
-  deletebtn: {
-    height: 20,
-    backgroundColor: "#ff0000",
-    paddingHorizontal: 20,
-    justifyContent: "center",
-    borderRadius: 10,
-  },
-
-  buttonText: {
-    color: "#fff",
-  },
-
-  taskList: {
-    marginTop: 20,
-  },
-
-  taskRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 8,
-    backgroundColor: "#f2f2f2",
-  },
-
-  checkedTaskItem: {
-    textDecorationLine: "line-through",
-    color: "#999",
-  },
-});
