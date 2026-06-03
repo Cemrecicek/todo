@@ -1,4 +1,4 @@
-import { createMMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv'
 import {
   createContext,
   ReactNode,
@@ -20,6 +20,7 @@ type TodoContextType = {
 };
 
 const storage = createMMKV();
+
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
