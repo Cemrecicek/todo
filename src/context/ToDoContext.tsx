@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createMMKV } from 'react-native-mmkv';
 import {
   createContext,
   ReactNode,
@@ -19,6 +19,8 @@ type TodoContextType = {
   toggleTask: (index: number) => void;
 };
 
+const storage = createMMKV();
+
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export function TodoProvider({ children }: { children: ReactNode }) {
@@ -28,15 +30,15 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     loadTasks();
   }, []);
 
-  const loadTasks = async () => {
-    const storedTasks = await AsyncStorage.getItem("tasks");
+  const loadTasks = () => {
+    const storedTasks = storage.getString("tasks");
 
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
     }
   };
-  const saveTasks = async (newTasks: Task[]) => {
-    await AsyncStorage.setItem("tasks", JSON.stringify(newTasks));
+  const saveTasks = (newTasks: Task[]) => {
+    storage.set("tasks", JSON.stringify(newTasks));
   };
 
   const addTask = (text: string) => {
