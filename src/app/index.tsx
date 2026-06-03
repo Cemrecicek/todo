@@ -6,6 +6,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useState } from "react";
 import { useTodo } from "../context/ToDoContext";
+import MyModule from "../../modules/my-module/src/MyModule";/////////??????
 
 export default function HomeScreen() {
   const [task, setTask] = useState("");
@@ -24,7 +25,7 @@ export default function HomeScreen() {
   return (
     <Box className="flex-1 bg-sky-100 px-5">
       <Box className=" px-5 pt-10 pb-5">
-        <Box className="mb-6 flex-row items-center gap-3">
+        <Box className="mb-6 flex-row items-center justify-between">
           <Text className="text-3xl">📝</Text>
           <Box>
             <Heading
@@ -34,6 +35,9 @@ export default function HomeScreen() {
               To Do List
             </Heading>
           </Box>
+          <Text className="text-xs text-gray-500">
+            {MyModule.getPlatform()}
+          </Text>
         </Box>
       </Box>
 
