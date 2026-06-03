@@ -6,12 +6,54 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useState } from "react";
 import { useTodo } from "../context/ToDoContext";
-import MyModule from "../../modules/my-module/src/MyModule";/////////??????
+import { Platform } from "react-native";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 
 export default function HomeScreen() {
   const [task, setTask] = useState("");
 
   const { tasks, addTask, deleteTask, toggleTask } = useTodo();
+
+  
+
+  const sendNotification = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+
+  if (status !== "granted") {
+    console.log("Bildirim izni verilmedi");
+    return;
+  }
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+    });
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Todo",
+      body: "Görev eklendi!",
+    },
+    trigger: {
+      seconds: 2,
+      channelId: "default",
+    },
+  });
+};
 
   const handleAddTask = () => {
     if (task.trim() === "") {
@@ -20,6 +62,7 @@ export default function HomeScreen() {
 
     addTask(task);
     setTask("");
+    return true;
   };
 
   return (
@@ -36,7 +79,7 @@ export default function HomeScreen() {
             </Heading>
           </Box>
           <Text className="text-xs text-gray-500">
-            {MyModule.getPlatform()}
+            {Device.osName}
           </Text>
         </Box>
       </Box>
@@ -56,7 +99,10 @@ export default function HomeScreen() {
         </Input>
 
         <Button
-          onPress={handleAddTask}
+          onPress={() => {
+          handleAddTask(); 
+          sendNotification();
+        }} 
           size="md"
           className="rounded-full border-white/80 bg-white/70 px-5"
         >
