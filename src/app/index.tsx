@@ -57,10 +57,10 @@ export default function HomeScreen() {
 
   const handleAddTask = () => {
     if (task.trim() === "") {
-      return;
+      return false;
     }
 
-    addTask(task);
+    addTask(task.trim());
     setTask("");
     return true;
   };
@@ -91,7 +91,13 @@ export default function HomeScreen() {
         >
           <InputField
             placeholder="Görev ekle..."
-            onSubmitEditing={handleAddTask}
+            onSubmitEditing={() => {
+              const added = handleAddTask();
+              
+              if (added) {
+                sendNotification();
+              }
+}}
             value={task}
             onChangeText={setTask}
             blurOnSubmit={false}
@@ -100,8 +106,10 @@ export default function HomeScreen() {
 
         <Button
           onPress={() => {
-          handleAddTask(); 
-          sendNotification();
+          const added = handleAddTask();
+          if (added) {
+            sendNotification();
+          }   
         }} 
           size="md"
           className="rounded-full border-white/80 bg-white/70 px-5"
