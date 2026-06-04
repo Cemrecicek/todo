@@ -1,4 +1,4 @@
-import { createMMKV } from 'react-native-mmkv'
+import TodoStorage from "../../modules/todo-storage/src/TodoStorageModule";
 import {
   createContext,
   ReactNode,
@@ -19,9 +19,6 @@ type TodoContextType = {
   toggleTask: (index: number) => void;
 };
 
-const storage = createMMKV();
-
-
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export function TodoProvider({ children }: { children: ReactNode }) {
@@ -31,15 +28,24 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     loadTasks();
   }, []);
 
-  const loadTasks = () => {
-    const storedTasks = storage.getString("tasks");
+  const loadTasks = async () => {
+    try {
+      const storedTasks = await TodoStorage.getString("tasks");
 
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
+      if (storedTasks) {
+        setTasks(JSON.parse(storedTasks));
+      }
+    } catch (error) {
+      console.log("Görevler yüklenemedi:", error);
     }
   };
-  const saveTasks = (newTasks: Task[]) => {
-    storage.set("tasks", JSON.stringify(newTasks));
+
+  const saveTasks = async (newTasks: Task[]) => {
+    try {
+      await TodoStorage.set("tasks", JSON.stringify(newTasks));
+    } catch (error) {
+      console.log("Görevler kaydedilemedi:", error);
+    }
   };
 
   const addTask = (text: string) => {

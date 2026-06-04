@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["TodoStorageModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.todostorage.TodoStorageModule"]
+  }
+}
