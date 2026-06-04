@@ -4,8 +4,7 @@
     "slug": "todo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "newArchEnabled": true,
-    "icon": "./assets/images/todo.jpg",
+    "icon": "./assets/images/todo.png",
     "scheme": "todo",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -14,16 +13,16 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/todo.jpg",
-        "backgroundImage": "./assets/images/todo.jpg",
-        "monochromeImage": "./assets/images/todo.jpg"
+        "foregroundImage": "./assets/images/todo.png",
+        "backgroundImage": "./assets/images/todo.png",
+        "monochromeImage": "./assets/images/todo.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.todo"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/todo.jpg"
+      "favicon": "./assets/images/todo.png"
     },
     "plugins": [
       "expo-router",
@@ -32,7 +31,7 @@
         {
           "backgroundColor": "#208AEF",
           "android": {
-            "image": "./assets/images/todo.jpg",
+            "image": "./assets/images/todo.png",
             "imageWidth": 76
           }
         }
