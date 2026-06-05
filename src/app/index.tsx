@@ -4,11 +4,14 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useState } from "react";
-import { useTodo } from "../context/ToDoContext";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+
+import TodoStorage from "../../modules/todo-storage/src/TodoStorageModule";
+import { useTodo } from "../context/ToDoContext";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -19,41 +22,57 @@ Notifications.setNotificationHandler({
   }),
 });
 
-
 export default function HomeScreen() {
   const [task, setTask] = useState("");
+  const [userName, setUserName] = useState("");
 
   const { tasks, addTask, deleteTask, toggleTask } = useTodo();
 
-  
+  useFocusEffect(
+    useCallback(() => {
+      const loadUserName = async () => {
+        try {
+          const name = await TodoStorage.getString("userName");
+
+          console.log("Kullanıcı adı yüklendi:", name);
+
+          setUserName(name ?? "");
+        } catch (error) {
+          console.log("Kullanıcı adı okunamadı:", error);
+        }
+      };
+
+      loadUserName();
+    }, [])
+  );
 
   const sendNotification = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.requestPermissionsAsync();
 
-  if (status !== "granted") {
-    console.log("Bildirim izni verilmedi");
-    return;
-  }
+    if (status !== "granted") {
+      console.log("Bildirim izni verilmedi");
+      return;
+    }
 
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+      });
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Todo",
+        body: "Görev eklendi!",
+      },
+      trigger: {
+        seconds: 2,
+        channelId: "default",
+      },
     });
-  }
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Todo",
-      body: "Görev eklendi!",
-    },
-    trigger: {
-      seconds: 2,
-      channelId: "default",
-    },
-  });
-};
+  };
 
   const handleAddTask = () => {
     if (task.trim() === "") {
@@ -62,14 +81,24 @@ export default function HomeScreen() {
 
     addTask(task.trim());
     setTask("");
+
     return true;
+  };
+
+  const handleSubmitTask = () => {
+    const added = handleAddTask();
+
+    if (added) {
+      sendNotification();
+    }
   };
 
   return (
     <Box className="flex-1 bg-sky-100 px-5">
-      <Box className=" px-5 pt-10 pb-5">
+      <Box className="px-5 pt-10 pb-5">
         <Box className="mb-6 flex-row items-center justify-between">
           <Text className="text-3xl">📝</Text>
+
           <Box>
             <Heading
               size="3xl"
@@ -77,40 +106,34 @@ export default function HomeScreen() {
             >
               To Do List
             </Heading>
+
+            {userName ? (
+              <Text className="text-center text-gray-500">
+                Kullanıcı: {userName}
+              </Text>
+            ) : null}
           </Box>
-          <Text className="text-xs text-gray-500">
-            {Device.osName}
-          </Text>
+
+          <Text className="text-xs text-gray-500">{Device.osName}</Text>
         </Box>
       </Box>
 
-      <Box className="flex-row items-center gap-3  pt-5">
+      <Box className="flex-row items-center gap-3 pt-5">
         <Input
           variant="rounded"
           className="flex-1 border border-white/80 bg-white/70"
         >
           <InputField
             placeholder="Görev ekle..."
-            onSubmitEditing={() => {
-              const added = handleAddTask();
-              
-              if (added) {
-                sendNotification();
-              }
-}}
             value={task}
             onChangeText={setTask}
+            onSubmitEditing={handleSubmitTask}
             blurOnSubmit={false}
           />
         </Input>
 
         <Button
-          onPress={() => {
-          const added = handleAddTask();
-          if (added) {
-            sendNotification();
-          }   
-        }} 
+          onPress={handleSubmitTask}
           size="md"
           className="rounded-full border-white/80 bg-white/70 px-5"
         >
@@ -124,6 +147,7 @@ export default function HomeScreen() {
             Henüz görev eklenmedi
           </Text>
         )}
+
         {tasks.map((item, index) => (
           <Box
             key={index}
@@ -133,7 +157,7 @@ export default function HomeScreen() {
               className="flex-1 flex-row items-center"
               onPress={() => toggleTask(index)}
             >
-              <Text className="mr-3 text-xxl text-green-600 ">
+              <Text className="mr-3 text-xxl text-green-600">
                 {item.checked ? "✓" : "⬜"}
               </Text>
 
