@@ -53,6 +53,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
     setTasks(newTasks);
     saveTasks(newTasks);
+    console.log("Görev eklendi:", text);
   };
 
   const deleteTask = (index: number) => {
@@ -60,15 +61,23 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
     setTasks(newTasks);
     saveTasks(newTasks);
+    console.log("Görev silindi:", tasks[index].text);
   };
 
   const toggleTask = (index: number) => {
     const newTasks = [...tasks];
 
     newTasks[index].checked = !newTasks[index].checked;
-
+    
+    const updatedTask = newTasks[index];
+    
     setTasks(newTasks);
     saveTasks(newTasks);
+
+    console.log(
+    "Görev durumu değiştirildi:",
+    updatedTask.text,
+    updatedTask.checked ? "tamamlandı" : "tamamlanmadı");
   };
 
   return (

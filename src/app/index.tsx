@@ -4,13 +4,11 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-
-import TodoStorage from "../../modules/todo-storage/src/TodoStorageModule";
+import { useLocalSearchParams } from "expo-router";
 import { useTodo } from "../context/ToDoContext";
 
 Notifications.setNotificationHandler({
@@ -24,29 +22,11 @@ Notifications.setNotificationHandler({
 
 export default function HomeScreen() {
   const [task, setTask] = useState("");
-  const [userName, setUserName] = useState("");
 
   const { tasks, addTask, deleteTask, toggleTask } = useTodo();
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadUserName = async () => {
-        try {
-          const name = await TodoStorage.getString("userName");
-
-          console.log("Kullanıcı adı yüklendi:", name);
-
-          setUserName(name ?? "");
-        } catch (error) {
-          console.log("Kullanıcı adı okunamadı:", error);
-        }
-      };
-
-      loadUserName();
-    }, [])
-  );
-
   const sendNotification = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
     const { status } = await Notifications.requestPermissionsAsync();
 
     if (status !== "granted") {
@@ -62,16 +42,17 @@ export default function HomeScreen() {
       });
     }
 
-    await Notifications.scheduleNotificationAsync({
+    const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
         title: "Todo",
         body: "Görev eklendi!",
       },
-      trigger: {
-        seconds: 2,
-        channelId: "default",
-      },
+      trigger: null,
     });
+    console.log("Bildirim id:", notificationId);
+
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    console.log("Bekleyen bildirimler:", scheduled);
   };
 
   const handleAddTask = () => {
@@ -81,7 +62,6 @@ export default function HomeScreen() {
 
     addTask(task.trim());
     setTask("");
-
     return true;
   };
 
@@ -90,31 +70,37 @@ export default function HomeScreen() {
 
     if (added) {
       sendNotification();
+      console.log("Bildirim gönderildi");
     }
   };
+
+  const params = useLocalSearchParams();
+  const userName = typeof params.userName === "string" ? params.userName : "";
 
   return (
     <Box className="flex-1 bg-sky-100 px-5">
       <Box className="px-5 pt-10 pb-5">
-        <Box className="mb-6 flex-row items-center justify-between">
-          <Text className="text-3xl">📝</Text>
+        <Box className="mb-6 flex-row items-start justify-between">
+          <Box className="flex-row items-start gap-3">
+            <Text className="text-3xl">📝</Text>
 
-          <Box>
-            <Heading
-              size="3xl"
-              style={{ fontFamily: "PatrickHand_400Regular" }}
-            >
-              To Do List
-            </Heading>
+            <Box>
+              <Heading
+                size="3xl"
+                style={{ fontFamily: "PatrickHand_400Regular" }}
+              >
+                To Do List
+              </Heading>
 
-            {userName ? (
-              <Text className="text-center text-gray-500">
-                Kullanıcı: {userName}
-              </Text>
-            ) : null}
+              {userName ? (
+                <Text className="text-left text-gray-500">
+                  Kullanıcı: {userName}
+                </Text>
+              ) : null}
+            </Box>
           </Box>
 
-          <Text className="text-xs text-gray-500">{Device.osName}</Text>
+          <Text className="mt-2 text-xs text-gray-500">{Device.osName}</Text>
         </Box>
       </Box>
 
