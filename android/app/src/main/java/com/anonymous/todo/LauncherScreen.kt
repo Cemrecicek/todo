@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -27,6 +29,7 @@ fun LauncherScreen(
   onOpenReactNative: (String) -> Unit
 ) {
   var name by remember { mutableStateOf("") }
+  var loading by remember { mutableStateOf(false) }
 
   MaterialTheme {
     Column(
@@ -51,6 +54,7 @@ fun LauncherScreen(
           Text("İsminizi giriniz")
         },
         singleLine = true,
+        enabled = !loading,
         modifier = Modifier.fillMaxWidth()
       )
 
@@ -58,12 +62,25 @@ fun LauncherScreen(
 
       Button(
         onClick = {
+          loading = true
           onOpenReactNative(name.trim())
         },
+        enabled = !loading && name.isNotBlank(),
         modifier = Modifier.fillMaxWidth()
       ) {
-        Text("React Native Sayfasını Aç")
+        Text(
+          text = if (loading) "Açılıyor..." else "React Native Sayfasını Aç"
+        )
       }
+
+      if (loading) {
+        Spacer(modifier = Modifier.height(24.dp))
+        CircularProgressIndicator(
+            modifier = Modifier.width(48.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        }
     }
   }
 }
