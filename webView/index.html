@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 15px;
+            background-color: rgba(88, 181, 204, 0.534)
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #50b3cc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #50b3cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Capacitor Giriş Katmanı</h3>
+    <input id="user_capacitor" type="text" placeholder="React Native'e gönderilecek isim...">
+    <button id="btn_send">İsmi React Native'e Gönder</button>
+
+    <script>
+        document.getElementById('btn_send').addEventListener('click', () => {
+            const inputValue = document.getElementById('user_capacitor').value;
+            
+            if (inputValue.trim() !== "") {
+                if (window.AndroidInterface) {
+                    window.AndroidInterface.sendData(inputValue);
+                } else if (window.Capacitor && window.Capacitor.Plugins.CentralBridge) {
+                    window.Capacitor.Plugins.CentralBridge.sendToKotlin({ value: inputValue });
+                } else {
+                    alert("Kullanıcı adı: " + inputValue);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

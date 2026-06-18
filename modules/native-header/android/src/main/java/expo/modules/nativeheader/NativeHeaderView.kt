@@ -79,14 +79,7 @@ fun NativeHeaderContent(userName: String, onSendClick: (String) -> Unit) {
                 .background(Color(0xFFE0F2FE))
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "📝 To Do List",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                color = Color(0xFF0369A1)
-            )
-
+            
             Spacer(modifier = Modifier.height(12.dp))
 
             TextField(

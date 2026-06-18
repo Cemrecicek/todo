@@ -7,11 +7,21 @@ class NativeHeaderModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("NativeHeader")
 
+       
         View(NativeHeaderView::class) {
-            Prop("userName") { view: NativeHeaderView, userName: String ->
-                view.setUserName(userName)
+            Prop("userName") { view, prop: String ->
+                view.setUserName(prop)
             }
-            Events("onInputChange")
         }
+
+        
+        View(CapacitorLoginView::class)
+
+        
+        Events("onCapacitorDataReceived")
+    }
+
+    fun emitWebData(data: String) {
+        sendEvent("onCapacitorDataReceived", mapOf("text" to data))
     }
 }
