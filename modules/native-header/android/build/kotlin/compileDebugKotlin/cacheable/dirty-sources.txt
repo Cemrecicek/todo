@@ -1,4 +1,0 @@
-C:\Users\cemre\todo\modules\native-header\android\src\main\java\expo\modules\nativeheader\CentralBridgeModule.kt
-C:\Users\cemre\todo\modules\native-header\android\src\main\java\expo\modules\nativeheader\CapacitorLoginView.kt
-C:\Users\cemre\todo\modules\native-header\android\src\main\java\expo\modules\nativeheader\NativeHeaderModule.kt
-C:\Users\cemre\todo\modules\native-header\android\src\main\java\expo\modules\nativeheader\NativeHeaderView.kt

@@ -4,12 +4,15 @@ import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useState } from "react";
-import { Platform } from "react-native";
+import { Platform, DeviceEventEmitter } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { useTodo } from "../context/ToDoContext";
-import { NativeHeaderView, CapacitorLoginView } from "../../modules/native-header/src";
+import { LegacyEventEmitter } from "expo-modules-core";
+import { NativeHeaderView, CapacitorLoginView, CentralBridge } from "../../modules/native-header/src";
 import { Heading } from "@/components/ui/heading";
+import { useEffect } from "react";
+
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -24,6 +27,25 @@ export default function HomeScreen() {
   const [task, setTask] = useState("");
   const { tasks, addTask, deleteTask, toggleTask } = useTodo();
   const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+  
+    const emitter = new LegacyEventEmitter(CentralBridge);
+
+    const subscription = emitter.addListener(
+      "onCapacitorDataReceived", 
+      (event: { text: string } | string) => {
+        const text = typeof event === "string" ? event : event?.text;
+        if (text) {
+          setUserName(text);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const sendNotification = async () => {
     await Notifications.cancelAllScheduledNotificationsAsync();

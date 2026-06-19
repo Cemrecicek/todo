@@ -6,4 +6,4 @@ export type CapacitorLoginViewProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export default requireNativeViewManager<{}>('CapacitorLoginView') as React.ComponentType<CapacitorLoginViewProps>;
+export default requireNativeViewManager<{}>('NativeHeader_CapacitorLoginView') as React.ComponentType<CapacitorLoginViewProps>;
