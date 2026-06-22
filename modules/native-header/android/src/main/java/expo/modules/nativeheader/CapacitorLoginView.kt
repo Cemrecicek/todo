@@ -1,7 +1,7 @@
 package expo.modules.nativeheader
 
 import android.content.Context
-import android.webkit.WebChromeClient // Bunu ekledik
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -14,12 +14,17 @@ class CapacitorLoginView(context: Context, appContext: AppContext) : ExpoView(co
     private val webView = WebView(context).apply {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
+        settings.cacheMode = android.webkit.WebSettings.LOAD_NO_CACHE
+        clearCache(true)
         webViewClient = WebViewClient()
         webChromeClient = WebChromeClient() 
         loadUrl("file:///android_asset/public/index.html")
     }
 
     init {
+    
+        NativeHeaderModule.registerLoginView(this)
+
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
@@ -53,5 +58,13 @@ class CapacitorLoginView(context: Context, appContext: AppContext) : ExpoView(co
         val bridge = WebAppInterface()
         webView.addJavascriptInterface(bridge, "AndroidInterface")
         webView.addJavascriptInterface(bridge, "AndroidBridge")
+    }
+
+    fun sendDataToJavaScript(data: String) {
+        appContext.mainQueue.launch {
+            val safeData = data.replace("'", "\\'")
+            webView.evaluateJavascript("window.handleDataFromReactNative('$safeData');", null)
+
+        }
     }
 }
